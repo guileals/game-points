@@ -1,23 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import { supabase } from "./utils/supabase";
 
 function App() {
+  const [points, setPoints] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function getPoints() {
+      setLoading(true);
+      const { data: points, error } = await supabase.from("pontuacao").select();
+
+      if (points.length > 1) {
+        setPoints(points);
+      } else {
+        setError(`Fetching products failed! ${error}`);
+      }
+    }
+    setLoading(false);
+
+    getPoints();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Pontuação</h1>
+      {error && <h2>{error}</h2>}
+      {loading && <h2>Loading...</h2>}
+      {!loading && !error && points.length > 0 &&
+        points.map((p) => (
+          <li key={p}>
+            {`\t${p.id} \t${p.nome} \t${p.matricula} \t${p.created_at}`}
+          </li>
+        ))}
     </div>
   );
 }
