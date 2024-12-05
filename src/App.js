@@ -11,13 +11,13 @@ function App() {
       setLoading(true);
       const { data: points, error } = await supabase.from("pontuacao").select();
 
-      if (points.length > 1) {
+      if (points.length > 0) {
         setPoints(points);
       } else {
         setError(`Fetching products failed! ${error}`);
       }
+      setLoading(false);
     }
-    setLoading(false);
 
     getPoints();
   }, []);
@@ -29,7 +29,7 @@ function App() {
       {loading && <h2>Loading...</h2>}
       {!loading && !error && points.length > 0 &&
         points.map((p) => (
-          <li key={p}>
+          <li key={p.id}>
             {`\t${p.id} \t${p.nome} \t${p.matricula} \t${p.created_at}`}
           </li>
         ))}
